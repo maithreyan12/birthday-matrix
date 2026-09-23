@@ -2,33 +2,39 @@ let pages = [];
 
 function initializeDefaultSettings() {
     window.settings = {
-        music:         'assets/music.mp3',
-        countdown:     3,
-        matrixText:    'HAPPYBIRTHDAY',
-        matrixColor1:  '#ff69b4',
-        matrixColor2:  '#ff1493',
+        music: 'assets/music.mp3',
+        countdown: 3,
+        matrixText: 'HAPPYBIRTHDAY',
+        matrixColor1: '#ff69b4',
+        matrixColor2: '#ff1493',
 
-        sequence:      'HAPPY|BIRTHDAY|MY|CUTEE|LITTLE|GIRL|❤',
+        sequence: 'HAPPY|BIRTHDAY|CUTIE|LITTLE|GURL|❤',
         sequenceColor: '#ff69b4',
 
-        gift:          './image/happy3.gif',
+        gift: './image/happy3.gif',
 
-        enableBook:    true,
-        enableHeart:   true,
-        colorTheme:    'pink',
+        enableBook: true,
+        enableHeart: true,
+        colorTheme: 'pink',
 
         pages: [
             { image: 'assets/main.jpg' },
-            { image: 'assets/image2.jpg',
-              content: 'Happy Birthday! 🎂' },
+            {
+                image: 'assets/image2.jpg',
+                content: 'Happy Birthday! 🎂'
+            },
 
             { image: 'assets/image3.jpg' },
-            { image: 'assets/image4.jpg',
-              content: 'You make every day special ❤️' },
+            {
+                image: 'assets/image4.jpg',
+                content: 'You make every day special ❤️'
+            },
 
             { image: 'assets/image5.jpg' },
-            { image: 'assets/image6.jpg',
-              content: 'Stay happy always, my love 💕' },
+            {
+                image: 'assets/image6.jpg',
+                content: 'Stay happy always, my love 💕'
+            },
         ],
     };
 
@@ -51,12 +57,12 @@ function applyLoadedSettings() {
 }
 
 function resetWebsiteState() {
-    const bookContainer  = document.querySelector('.book-container');
-    const mainCanvas     = document.querySelector('.canvas');
-    const matrixCanvas   = document.getElementById('matrix-rain');
-    const giftImageEl    = document.getElementById('gift-image');
+    const bookContainer = document.querySelector('.book-container');
+    const mainCanvas = document.querySelector('.canvas');
+    const matrixCanvas = document.getElementById('matrix-rain');
+    const giftImageEl = document.getElementById('gift-image');
     const contentDisplay = document.getElementById('contentDisplay');
-    const fireworksEl    = document.getElementById('fireworkContainer');
+    const fireworksEl = document.getElementById('fireworkContainer');
 
     if (typeof S !== 'undefined') S.initialized = false;
     if (typeof hideStars === 'function') hideStars();
@@ -65,10 +71,10 @@ function resetWebsiteState() {
     const bookEl = document.getElementById('book');
     if (bookEl) bookEl.classList.remove('show');
     if (contentDisplay) { contentDisplay.classList.remove('show'); contentDisplay.style.display = 'none'; }
-    if (giftImageEl)  giftImageEl.style.display  = 'none';
-    if (fireworksEl)  fireworksEl.innerHTML       = '';
-    if (mainCanvas)   mainCanvas.style.display    = 'block';
-    if (matrixCanvas) matrixCanvas.style.display  = 'block';
+    if (giftImageEl) giftImageEl.style.display = 'none';
+    if (fireworksEl) fireworksEl.innerHTML = '';
+    if (mainCanvas) mainCanvas.style.display = 'block';
+    if (matrixCanvas) matrixCanvas.style.display = 'block';
 
     if (matrixCanvas) {
         const ctx = matrixCanvas.getContext('2d');
@@ -155,18 +161,18 @@ function createPages() {
 
     book.innerHTML = '';
 
-    if (typeof currentPage    !== 'undefined') currentPage    = 0;
-    if (typeof isFlipping     !== 'undefined') isFlipping     = false;
+    if (typeof currentPage !== 'undefined') currentPage = 0;
+    if (typeof isFlipping !== 'undefined') isFlipping = false;
     if (typeof isBookFinished !== 'undefined') isBookFinished = false;
 
     if (!pages || pages.length === 0) return;
 
-    const totalLogicalPages  = pages.length;
+    const totalLogicalPages = pages.length;
     const totalPhysicalPages = Math.ceil(totalLogicalPages / 2);
 
     for (let physIdx = 0; physIdx < totalPhysicalPages; physIdx++) {
         const frontLogIdx = physIdx * 2;
-        const backLogIdx  = frontLogIdx + 1;
+        const backLogIdx = frontLogIdx + 1;
 
         const page = document.createElement('div');
         page.classList.add('page');
@@ -190,7 +196,7 @@ function createPages() {
 
         page.addEventListener('click', function (e) {
             if (isFlipping) return;
-            const rect   = this.getBoundingClientRect();
+            const rect = this.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
             if (clickX < rect.width / 2 && this.classList.contains('flipped')) {
                 if (typeof prevPage === 'function') prevPage();
@@ -206,7 +212,7 @@ function createPages() {
             .map(p => p.image);
 
         if (photoUrls.length === 0) {
-            const cols = ['#ff9a9e','#a18cd1','#ffecd2','#a1c4fd','#fd7f6f','#43e97b','#fbc2eb','#c2e9fb'];
+            const cols = ['#ff9a9e', '#a18cd1', '#ffecd2', '#a1c4fd', '#fd7f6f', '#43e97b', '#fbc2eb', '#c2e9fb'];
             photoUrls = cols.map(c => `data:image/svg+xml;base64,${btoa(
                 `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80">` +
                 `<circle cx="40" cy="40" r="38" fill="${c}"/>` +
@@ -230,9 +236,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (fsBtn) {
         fsBtn.addEventListener('click', function () {
             const el = document.documentElement;
-            if (el.requestFullscreen)            el.requestFullscreen();
+            if (el.requestFullscreen) el.requestFullscreen();
             else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-            else if (el.mozRequestFullScreen)    el.mozRequestFullScreen();
+            else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
         });
     }
     updateFullscreenBtnVisibility();
