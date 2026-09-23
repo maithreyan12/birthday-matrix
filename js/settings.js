@@ -14,26 +14,29 @@ function initializeDefaultSettings() {
         gift: './image/happy3.gif',
 
         enableBook: true,
-        enableHeart: true,
+        enableHeart: false,
         colorTheme: 'pink',
 
         pages: [
-            { image: 'assets/main.jpg' },
             {
                 image: 'assets/image2.jpg',
                 content: 'Happy Birthday! 🎂'
             },
-
-            { image: 'assets/image3.jpg' },
+            {
+                image: 'assets/image3.jpg',
+                content: 'Happy Birthday! 🎂'
+            },
             {
                 image: 'assets/image4.jpg',
                 content: 'You make every day special ❤️'
             },
-
-            { image: 'assets/image5.jpg' },
+            {
+                image: 'assets/image5.jpg',
+                content: 'You make every day special ❤️'
+            },
             {
                 image: 'assets/image6.jpg',
-                content: 'Stay happy always as my Friend 💕'
+                content: 'Stay happy always, my love 💕'
             },
         ],
     };
@@ -63,6 +66,14 @@ function resetWebsiteState() {
     const giftImageEl = document.getElementById('gift-image');
     const contentDisplay = document.getElementById('contentDisplay');
     const fireworksEl = document.getElementById('fireworkContainer');
+    const bgVideo = document.getElementById('book-bg-video');
+
+    if (bgVideo) {
+        bgVideo.pause();
+        bgVideo.currentTime = 0;
+        bgVideo.style.opacity = '0';
+        bgVideo.style.display = 'none';
+    }
 
     if (typeof S !== 'undefined') S.initialized = false;
     if (typeof hideStars === 'function') hideStars();
@@ -208,7 +219,7 @@ function createPages() {
 
     if (typeof photoUrls !== 'undefined') {
         photoUrls = pages
-            .filter(p => p.image && !p.image.startsWith('gradient:'))
+            .filter(p => p.image && !p.image.startsWith('gradient:') && !p.image.includes('main.jpg'))
             .map(p => p.image);
 
         if (photoUrls.length === 0) {

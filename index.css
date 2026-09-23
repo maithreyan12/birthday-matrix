@@ -66,6 +66,7 @@ body {
 .book-container {
     perspective: 2000px;
     position: relative;
+    z-index: 20;
     display: none; opacity: 0;
     transform: scale(0.8) translateY(50px);
     transition: opacity 1s ease, transform 1s ease;
@@ -174,7 +175,7 @@ body {
     backdrop-filter: blur(20px);
     opacity: 0; display: none; pointer-events: none;
     overflow-y: auto; box-sizing: border-box;
-    transition: all 0.5s ease; z-index: 10;
+    transition: all 0.5s ease; z-index: 30;
 }
 .content-display::after {
     content: '💕';

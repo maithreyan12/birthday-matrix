@@ -924,6 +924,15 @@ function showFloatingHearts() {
 function showBook() {
     const book = document.getElementById('book');
     const bookContainer = document.querySelector('.book-container');
+    const bgVideo = document.getElementById('book-bg-video');
+
+    if (bgVideo) {
+        bgVideo.style.display = 'block';
+        bgVideo.play().catch(e => console.log('Video play:', e));
+        requestAnimationFrame(() => {
+            bgVideo.style.opacity = '1';
+        });
+    }
 
     showStars();
     if (book && bookContainer) {
@@ -968,7 +977,7 @@ let currentPage = 0;
 let isFlipping = false;
 let typewriterTimeout;
 let isBookFinished = false;
-let photoUrls = pages.filter(page => page.image).map(page => page.image);
+let photoUrls = pages.filter(page => page.image && !page.image.includes('main.jpg')).map(page => page.image);
 
 function showConfetti() {
     const confettiColors = ['#ff6f91', '#ff9671', '#ffc75f', '#f9f871', '#ff3c78'];
@@ -1143,16 +1152,16 @@ function checkBookFinished() {
     if (currentPage === lastPageIndex && lastPage && lastPage.classList.contains('flipped')) {
         if (!isBookFinished) {
             isBookFinished = true;
-            const contentDisplay = document.getElementById('contentDisplay');
-            if (contentDisplay) {
-                contentDisplay.classList.remove('show');
-            }
-            setTimeout(() => {
-                const currentSettings = window.settings || settings;
-                if (currentSettings.enableHeart) {
-                    startHeartEffect();
+            const currentSettings = window.settings || settings;
+            if (currentSettings.enableHeart) {
+                const contentDisplay = document.getElementById('contentDisplay');
+                if (contentDisplay) {
+                    contentDisplay.classList.remove('show');
                 }
-            }, 1000);
+                setTimeout(() => {
+                    startHeartEffect();
+                }, 1000);
+            }
         }
     }
 }
@@ -1251,7 +1260,13 @@ async function showPageContent() {
             logicalPageIndex = currentPage * 2;
         }
     }
-    const contentToShow = pages[logicalPageIndex]?.content;
+    let contentToShow = pages[logicalPageIndex]?.content;
+    if (!contentToShow && currentPage > 0) {
+        const leftIndex = (currentPage - 1) * 2 + 1;
+        if (pages[leftIndex]?.content) {
+            contentToShow = pages[leftIndex].content;
+        }
+    }
     if (contentToShow) {
         contentDisplay.classList.add('show');
         contentText.innerHTML = '';
