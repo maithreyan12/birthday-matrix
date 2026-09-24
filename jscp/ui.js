@@ -933,6 +933,10 @@ function showFloatingHearts() {
 }
 
 function showBook() {
+    if (typeof matrixInterval !== 'undefined' && matrixInterval) {
+        clearInterval(matrixInterval);
+        matrixInterval = null;
+    }
     const matrixCanvas = document.getElementById('matrix-rain');
     if (matrixCanvas) matrixCanvas.style.display = 'none';
     const mainCanvas = document.querySelector('.canvas');

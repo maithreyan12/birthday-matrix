@@ -27,8 +27,14 @@ function initializeDefaultSettings() {
             { image: 'assets/image5.jpg' },
             { image: 'assets/image6.jpg',
               content: 'Stay happy always, my love 💕' },
+            { image: 'assets/image7.jpg',
+              content: 'سکونِ قلب رب کے قریب ہے ✨' },
+            { image: 'assets/image8.jpg',
+              content: 'Some people just get you ❤️' },
+            { image: 'assets/image9.jpg',
+              content: 'میری ہر خوبصورت دعا کا جواب تم ہو 🌹' },
             { image: 'card',
-              content: 'Forever & Always ❤️' },
+              content: 'Forever & Always 💕' },
             { image: 'backcover' }
         ],
     };
