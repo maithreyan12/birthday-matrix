@@ -17,27 +17,19 @@ function initializeDefaultSettings() {
         enableHeart: false,
         colorTheme: 'pink',
 
-        pages: [
-            {
-                image: 'assets/image2.jpg',
-                content: 'Happy Birthday! 🎂'
-            },
-            {
-                image: 'assets/image3.jpg',
-                content: 'Happy Birthday! 🎂'
-            },
-            {
-                image: 'assets/image4.jpg',
-                content: 'You make every day special ❤️'
-            },
-            {
-                image: 'assets/image5.jpg',
-                content: 'You make every day special ❤️'
-            },
-            {
-                image: 'assets/image6.jpg',
-                content: 'Stay happy always, my love 💕'
-            },
+                pages: [
+            { image: 'assets/main.jpg' },
+            { image: 'assets/image2.jpg',
+              content: 'Happy Birthday! 🎂' },
+            { image: 'assets/image3.jpg' },
+            { image: 'assets/image4.jpg',
+              content: 'You make every day special ❤️' },
+            { image: 'assets/image5.jpg' },
+            { image: 'assets/image6.jpg',
+              content: 'Stay happy always, my love 💕' },
+            { image: 'card',
+              content: 'Forever & Always ❤️' },
+            { image: 'backcover' }
         ],
     };
 
@@ -85,7 +77,7 @@ function resetWebsiteState() {
 
     if (bookContainer) { bookContainer.classList.remove('show'); bookContainer.style.display = 'none'; }
     const bookEl = document.getElementById('book');
-    if (bookEl) bookEl.classList.remove('show');
+    if (bookEl) bookEl.classList.remove('show', 'opened', 'finished');
     if (contentDisplay) { contentDisplay.classList.remove('show'); contentDisplay.style.display = 'none'; }
     if (giftImageEl) giftImageEl.style.display = 'none';
     if (fireworksEl) fireworksEl.innerHTML = '';
@@ -115,6 +107,31 @@ function resetWebsiteState() {
 }
 
 function _applyPageFaceContent(face, pageData, logicalIndex, isFront) {
+    if (pageData && pageData.image === 'card') {
+        face.innerHTML = `
+            <div class="birthday-card-face">
+                <div class="card-stars">✨ 🌟 ✨</div>
+                <h2 class="card-title">Happy Birthday</h2>
+                <div class="card-divider"></div>
+                <p class="card-message">
+                    To the one who fills every day with love, laughter, and pure happiness.<br><br>
+                    May all your wishes come true today and always.
+                </p>
+                <div class="card-sign">Forever & Always ❤️</div>
+            </div>
+        `;
+        return;
+    }
+    if (pageData && pageData.image === 'backcover') {
+        face.innerHTML = `
+            <div class="book-backcover-face">
+                <div class="backcover-ornament">✦ ✧ ✦</div>
+                <div class="backcover-title">The End</div>
+                <div class="backcover-sub">With Infinite Love ❤️</div>
+            </div>
+        `;
+        return;
+    }
     if (pageData && pageData.image) {
         if (pageData.image.startsWith('gradient:')) {
             face.style.background = pageData.image.replace('gradient:', '');
@@ -177,6 +194,10 @@ function createPages() {
 
     book.innerHTML = '';
 
+    const baseEl = document.createElement('div');
+    baseEl.className = 'book-base';
+    book.appendChild(baseEl);
+
     if (typeof currentPage !== 'undefined') currentPage = 0;
     if (typeof isFlipping !== 'undefined') isFlipping = false;
     if (typeof isBookFinished !== 'undefined') isBookFinished = false;
@@ -224,7 +245,7 @@ function createPages() {
 
     if (typeof photoUrls !== 'undefined') {
         photoUrls = pages
-            .filter(p => p.image && !p.image.startsWith('gradient:') && !p.image.includes('main.jpg'))
+            .filter(p => p.image && !p.image.startsWith('gradient:') && !p.image.includes('main.jpg') && p.image !== 'card' && p.image !== 'backcover')
             .map(p => p.image);
 
         if (photoUrls.length === 0) {

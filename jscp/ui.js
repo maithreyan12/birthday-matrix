@@ -933,6 +933,13 @@ function showFloatingHearts() {
 }
 
 function showBook() {
+    const matrixCanvas = document.getElementById('matrix-rain');
+    if (matrixCanvas) matrixCanvas.style.display = 'none';
+    const mainCanvas = document.querySelector('.canvas');
+    if (mainCanvas) mainCanvas.style.display = 'none';
+    const giftImage = document.getElementById('gift-image');
+    if (giftImage) giftImage.style.display = 'none';
+
     const book = document.getElementById('book');
     const bookContainer = document.querySelector('.book-container');
     const bgVideo = document.getElementById('book-bg-video');
@@ -954,14 +961,14 @@ function showBook() {
         calculatePageZIndexes();
         setupPageObserver();
 
+        book.classList.add('show');
+        updateBookCentering();
         requestAnimationFrame(() => {
             book.style.opacity = '0';
-            book.style.transform = 'scale(0.8) translateY(50px)';
-            book.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            book.style.transition = 'opacity 1s ease';
 
             requestAnimationFrame(() => {
                 book.style.opacity = '1';
-                book.style.transform = 'scale(1) translateY(0)';
                 setTimeout(() => {
                     if (!isPlaying) {
                         toggleMusic();
@@ -1177,32 +1184,39 @@ function checkBookFinished() {
     }
 }
 
+function updateBookCentering() {
+    const bookEl = document.getElementById('book');
+    if (!bookEl) return;
+    const totalPhysicalPages = Math.ceil(pages.length / 2);
+    if (currentPage === 0) {
+        bookEl.classList.remove('opened', 'finished');
+    } else if (currentPage >= totalPhysicalPages) {
+        bookEl.classList.remove('opened');
+        bookEl.classList.add('finished');
+    } else {
+        bookEl.classList.remove('finished');
+        bookEl.classList.add('opened');
+    }
+}
+
 function nextPage() {
     const totalPhysicalPages = Math.ceil(pages.length / 2);
-    if (currentPage < totalPhysicalPages - 1 && !isFlipping) {
+    if (currentPage < totalPhysicalPages && !isFlipping) {
         isFlipping = true;
-        const pageToFlip = document.querySelector(`.page[data-page="${currentPage}"]`);
-        pageToFlip.classList.add('flipping');
-        setTimeout(() => {
-            pageToFlip.classList.remove('flipping');
+        const pageToFlip = document.querySelector('.page[data-page="' + currentPage + '"]');
+        if (pageToFlip) {
+            pageToFlip.style.zIndex = '100';
             pageToFlip.classList.add('flipped');
             currentPage++;
-            isFlipping = false;
-            showPageContent();
-            checkBookFinished();
-        }, 400);
-    } else if (currentPage === totalPhysicalPages - 1 && !isFlipping) {
-        const lastPage = document.querySelector(`.page[data-page="${currentPage}"]`);
-        if (lastPage && !lastPage.classList.contains('flipped')) {
-            isFlipping = true;
-            lastPage.classList.add('flipping');
+            updateBookCentering();
             setTimeout(() => {
-                lastPage.classList.remove('flipping');
-                lastPage.classList.add('flipped');
+                pageToFlip.style.removeProperty('z-index');
                 isFlipping = false;
                 showPageContent();
                 checkBookFinished();
-            }, 400);
+            }, 1000);
+        } else {
+            isFlipping = false;
         }
     }
 }
@@ -1211,15 +1225,20 @@ function prevPage() {
     if (currentPage > 0 && !isFlipping) {
         isFlipping = true;
         currentPage--;
-        const pageToFlip = document.querySelector(`.page[data-page="${currentPage}"]`);
-        pageToFlip.classList.add('flipping');
-        setTimeout(() => {
-            pageToFlip.classList.remove('flipping');
+        updateBookCentering();
+        const pageToFlip = document.querySelector('.page[data-page="' + currentPage + '"]');
+        if (pageToFlip) {
+            pageToFlip.style.zIndex = '100';
             pageToFlip.classList.remove('flipped');
+            setTimeout(() => {
+                pageToFlip.style.removeProperty('z-index');
+                isFlipping = false;
+                showPageContent();
+                isBookFinished = false;
+            }, 1000);
+        } else {
             isFlipping = false;
-            showPageContent();
-            isBookFinished = false;
-        }, 400);
+        }
     }
 }
 

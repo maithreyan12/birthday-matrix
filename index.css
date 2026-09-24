@@ -64,75 +64,140 @@ body {
 .star:nth-child(6n) { animation-delay: 1.2s; }
 
 .book-container {
-    perspective: 2000px;
+    perspective: 2500px;
     position: relative;
-    z-index: 20;
+    z-index: 25;
     display: none; opacity: 0;
-    transform: scale(0.8) translateY(50px);
-    transition: opacity 1s ease, transform 1s ease;
+    transform: scale(0.85) translateY(40px);
+    transition: opacity 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .book-container.show {
     display: block; opacity: 1;
-    transform: scale(1) translateY(80px);
+    transform: scale(1) translateY(40px);
 }
 .book-container::before {
     content: '';
-    position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px;
-    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-    z-index: -1; filter: blur(15px);
-    animation: glowPulse 3s ease-in-out infinite;
+    position: absolute;
+    top: -50px; left: -50px; right: -50px; bottom: -50px;
+    background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.28) 0%, rgba(255, 105, 180, 0.15) 35%, transparent 70%);
+    z-index: -1;
+    filter: blur(35px);
+    animation: luxuryGlow 4s ease-in-out infinite alternate;
 }
-@keyframes glowPulse {
-    0%,100% { opacity: 0.5; transform: scale(1);    }
-    50%      { opacity: 0.8; transform: scale(1.05); }
+@keyframes luxuryGlow {
+    0%   { opacity: 0.5; transform: scale(0.96); filter: blur(30px); }
+    100% { opacity: 0.85; transform: scale(1.06); filter: blur(40px); }
 }
 
 .book {
-    width: 600px; height: 400px;
+    width: 640px; height: 460px;
     position: relative; transform-style: preserve-3d;
-    transition: transform 0.5s ease;
+    transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
     cursor: grab; user-select: none; display: none;
+    transform: translateX(-25%); /* Center the closed cover by default */
 }
 .book.show { display: block; }
+.book.opened { transform: translateX(0%) !important; } /* Center the open 2-page spread */
+.book.finished { transform: translateX(25%) !important; } /* Center the closed back */
+
+/* Elegant Book Hardcover Base (Visible on Open Spread) */
+.book-base {
+    position: absolute;
+    top: -6px; left: -6px; right: -6px; bottom: -6px;
+    background: linear-gradient(135deg, #1b120c 0%, #29170e 45%, #140c07 100%);
+    border-radius: 12px;
+    border: 1.5px solid rgba(212, 175, 55, 0.45);
+    box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.85),
+        0 8px 20px rgba(0, 0, 0, 0.5),
+        inset 0 0 25px rgba(0, 0, 0, 0.9);
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+.book.opened .book-base {
+    opacity: 1;
+}
+
+/* Subtle Realistic Book Spine Crease */
+.book::before {
+    content: '';
+    position: absolute;
+    left: calc(50% - 5px);
+    top: -3px;
+    bottom: -3px;
+    width: 10px;
+    background: linear-gradient(
+        90deg,
+        rgba(10, 5, 2, 0.75) 0%,
+        rgba(45, 25, 15, 0.4) 30%,
+        rgba(212, 175, 55, 0.5) 50%,
+        rgba(45, 25, 15, 0.4) 70%,
+        rgba(10, 5, 2, 0.75) 100%
+    );
+    border-radius: 4px;
+    box-shadow:
+        0 0 12px rgba(0, 0, 0, 0.75),
+        inset 0 0 4px rgba(0, 0, 0, 0.8);
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+.book.opened::before {
+    opacity: 1;
+}
 
 .page {
-    width: 300px; height: 400px;
+    width: 320px; height: 460px;
     position: absolute; top: 0; right: 0;
     transform-origin: left center;
     transform-style: preserve-3d;
-    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 1s cubic-bezier(0.25, 1, 0.5, 1);
     box-shadow:
-        0 0 0 1px rgba(255,255,255,0.8),
-        0 10px 20px rgba(0,0,0,0.2),
-        inset 0 0 0 1px rgba(0,0,0,0.1);
+        0 14px 32px rgba(0,0,0,0.45),
+        0 3px 10px rgba(0,0,0,0.25);
     cursor: pointer;
     touch-action: pan-x;
     z-index: var(--page-z-index, 1);
+    border-radius: 0 8px 8px 0;
+    will-change: transform;
 }
 .page.flipped {
     transform: rotateY(-180deg);
     box-shadow:
-        0 0 0 1px rgba(255,255,255,0.8),
-        -10px 10px 20px rgba(0,0,0,0.3),
-        inset 0 0 0 1px rgba(0,0,0,0.1);
+        -14px 14px 32px rgba(0,0,0,0.45),
+        -3px 3px 10px rgba(0,0,0,0.25);
     z-index: var(--page-flipped-z-index, 1);
-}
-.page.flipping {
-    transform: rotateY(-90deg);
-    box-shadow:
-        0 0 0 1px rgba(255,255,255,0.8),
-        -5px 10px 30px rgba(0,0,0,0.4),
-        inset 0 0 0 1px rgba(0,0,0,0.1);
+    border-radius: 8px 0 0 8px;
 }
 
 .page-front,
 .page-back {
     position: absolute; width: 100%; height: 100%;
     backface-visibility: hidden; overflow: hidden;
-    border: 2px solid #ddd; border-radius: 0 8px 8px 0;
+    background: #fbf9f5;
+    border-radius: 0 10px 10px 0;
+    border: 1px solid rgba(212, 175, 55, 0.35);
 }
-.page-front { background: white; z-index: 2; }
-.page-back  { background: white; transform: rotateY(180deg); border-radius: 8px 0 0 8px; }
+.page-front {
+    background: #fbf9f5;
+    z-index: 2;
+}
+.page-back {
+    background: #fbf9f5;
+    transform: rotateY(180deg);
+    border-radius: 10px 0 0 10px;
+}
+
+/* Luxury Hardcover Front Trim (First Page) */
+.page[data-page="0"] .page-front {
+    border: 3px solid #d4af37;
+    box-shadow:
+        0 0 0 1px #fff5cc,
+        inset 0 0 25px rgba(0,0,0,0.5);
+}
 
 .page-front img,
 .page-back img {
@@ -141,17 +206,36 @@ body {
     border-radius: inherit; position: relative; z-index: 1;
 }
 
-.page-front::before,
+/* Deep Realistic Crease & Paper Shadow Gradients */
+.page-front::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; bottom: 0; width: 50px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.15) 30%, transparent 100%);
+    z-index: 10; pointer-events: none;
+}
 .page-back::before {
     content: ''; position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    z-index: 0; pointer-events: none;
+    top: 0; right: 0; bottom: 0; width: 50px;
+    background: linear-gradient(270deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.15) 30%, transparent 100%);
+    z-index: 10; pointer-events: none;
 }
-.page-front::before {
-    background: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.05) 2%, transparent 10%);
+
+/* Elegant Page Edge Trim */
+.page-front::after {
+    content: ''; position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 5;
 }
-.page-back::before {
-    background: linear-gradient(90deg, transparent 90%, rgba(0,0,0,0.05) 98%, rgba(0,0,0,0.1) 100%);
+.page-back::after {
+    content: ''; position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 5;
 }
 
 .empty-page {
@@ -282,4 +366,104 @@ body {
     .photo              { width: 60px; height: 60px; }
     .firework-container { width: 100px; height: 100px; }
     .music-control { width: 35px; height: 35px; font-size: 18px; top: 10px; right: 10px; }
+}
+/* Luxury Ending Birthday Card */
+.birthday-card-face {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 35%, #251329 0%, #14081c 65%, #0a030f 100%);
+    border: 2px solid rgba(212, 175, 55, 0.65);
+    border-radius: inherit;
+    box-sizing: border-box;
+    padding: 35px 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        inset 0 0 35px rgba(0, 0, 0, 0.85),
+        inset 0 0 15px rgba(212, 175, 55, 0.25);
+}
+.birthday-card-face::before {
+    content: '';
+    position: absolute;
+    top: 10px; left: 10px; right: 10px; bottom: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: inherit;
+    pointer-events: none;
+}
+.card-stars {
+    font-size: 22px;
+    letter-spacing: 5px;
+    margin-bottom: 10px;
+    animation: luxuryGlow 3s ease-in-out infinite alternate;
+}
+.card-title {
+    font-family: 'Pacifico', cursive;
+    font-size: 26px;
+    font-weight: 400;
+    color: #fce4a6;
+    margin: 0 0 10px 0;
+    text-shadow: 0 2px 12px rgba(212, 175, 55, 0.6);
+}
+.card-divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    margin-bottom: 16px;
+}
+.card-message {
+    font-family: 'Dancing Script', cursive;
+    font-size: 19px;
+    line-height: 1.65;
+    color: #fbf5ea;
+    margin: 0 0 18px 0;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+    font-weight: 500;
+}
+.card-sign {
+    font-family: 'Dancing Script', cursive;
+    font-size: 22px;
+    font-weight: 700;
+    color: #ff94ab;
+    text-shadow: 0 2px 10px rgba(255, 105, 180, 0.5);
+}
+
+/* Luxury Hardcover Back */
+.book-backcover-face {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1b120c 0%, #2e1a10 50%, #160e0a 100%);
+    border: 3px solid #d4af37;
+    border-radius: inherit;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow:
+        0 0 0 1px #fff5cc,
+        inset 0 0 35px rgba(0,0,0,0.85);
+}
+.backcover-ornament {
+    font-size: 20px;
+    color: #d4af37;
+    letter-spacing: 6px;
+    margin-bottom: 12px;
+}
+.backcover-title {
+    font-family: 'Pacifico', cursive;
+    font-size: 28px;
+    color: #f7d57f;
+    text-shadow: 0 2px 12px rgba(212,175,55,0.6);
+    margin-bottom: 6px;
+}
+.backcover-sub {
+    font-family: 'Dancing Script', cursive;
+    font-size: 20px;
+    color: #ff94ab;
+    font-weight: 600;
 }
