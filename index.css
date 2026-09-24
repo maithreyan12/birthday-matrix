@@ -251,17 +251,8 @@ body {
 }
 
 .music-control {
-    position: fixed; top: 20px; right: 20px;
-    width: 40px; height: 40px;
-    background: none; border: none; border-radius: 50%;
-    cursor: pointer; z-index: 10001;
-    box-shadow: 0 4px 15px rgba(250,250,250,0.4);
-    transition: all 0.3s ease;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 17px; color: rgb(205,202,202); outline: none;
+    display: none !important;
 }
-.music-control:hover  { transform: scale(1.1); box-shadow: 0 6px 20px rgba(255,107,157,0.6); }
-.music-control:active { transform: scale(0.95); }
 .music-control.playing { animation: musicPulse 1.5s infinite; }
 @keyframes musicPulse {
     0%,100% { transform: scale(1);    box-shadow: 0 4px 15px rgba(255,107,157,0.4); }

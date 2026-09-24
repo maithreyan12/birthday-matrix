@@ -41,7 +41,7 @@
             <div class="book" id="book"></div>
         </div>
 
-        <button class="music-control" id="musicControl" title="Play/Pause Music">▶</button>
+        <button class="music-control" id="musicControl" title="Play/Pause Music" style="display:none;">▶</button>
 
         <button id="fullscreenBtn" style="
             position:fixed;bottom:20px;right:20px;z-index:990010;
@@ -50,7 +50,8 @@
             box-shadow:0 2px 8px rgba(0,0,0,0.15);cursor:pointer;display:none;">
             <img style="width:20px;height:20px;vertical-align:middle;" src="image/full.png" alt="⛶">
         </button>
-        <audio id="birthdayAudio" loop>
+        <audio id="birthdayAudio" src="assets/music.m4a" loop preload="auto" playsinline>
+            <source src="assets/music.m4a" type="audio/mp4">
             <source src="assets/music.mp3" type="audio/mpeg">
         </audio>
 

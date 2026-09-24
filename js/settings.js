@@ -2,7 +2,7 @@ let pages = [];
 
 function initializeDefaultSettings() {
     window.settings = {
-        music: 'assets/music.mp3',
+        music: 'assets/music.m4a',
         countdown: 3,
         matrixText: 'HAPPYBIRTHDAY',
         matrixColor1: '#ff69b4',
@@ -47,7 +47,12 @@ function initializeDefaultSettings() {
 function applyLoadedSettings() {
     const s = window.settings;
     const audio = document.getElementById('birthdayAudio');
-    if (audio && s.music) audio.src = s.music;
+    if (audio && s.music) {
+        const curSrc = audio.currentSrc || audio.src;
+        if (!curSrc || (!curSrc.includes('assets/music.mp3') && !curSrc.includes('assets/music.m4a') && !curSrc.includes(s.music))) {
+            audio.src = s.music;
+        }
+    }
 
     const giftImg = document.getElementById('gift-image');
     if (giftImg && s.gift) giftImg.src = s.gift;

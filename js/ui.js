@@ -102,16 +102,19 @@ function checkOrientation() {
 }
 var _websiteStarted = false;
 function startWebsite() {
+    if (typeof attemptAutoPlay === 'function') {
+        attemptAutoPlay();
+    }
     if (!matrixInterval) {
         initMatrixRain();
     }
     if (!_websiteStarted) {
         _websiteStarted = true;
+        S.init();
+        S.initialized = true;
         if (typeof resetWebsiteState === 'function') {
             resetWebsiteState();
         }
-        S.init();
-        S.initialized = true;
     } else {
         if (S.Drawing && typeof S.Drawing.adjustCanvas === 'function') {
             S.Drawing.adjustCanvas();
@@ -675,14 +678,22 @@ S.ShapeBuilder = (function () {
 
     function fit() {
         const gap = getGap();
-        shapeCanvas.width = Math.floor(window.innerWidth / gap) * gap;
-        shapeCanvas.height = Math.floor(window.innerHeight / gap) * gap;
+        const w = window.innerWidth || document.documentElement.clientWidth || 800;
+        const h = window.innerHeight || document.documentElement.clientHeight || 600;
+        shapeCanvas.width = Math.max(gap * 10, Math.floor(w / gap) * gap);
+        shapeCanvas.height = Math.max(gap * 10, Math.floor(h / gap) * gap);
         shapeContext.fillStyle = 'red';
         shapeContext.textBaseline = 'middle';
         shapeContext.textAlign = 'center';
     }
 
     function processCanvas() {
+        if (!shapeCanvas.width || !shapeCanvas.height) {
+            fit();
+        }
+        if (!shapeCanvas.width || !shapeCanvas.height) {
+            return [];
+        }
         const gap = getGap();
         var pixels = shapeContext.getImageData(0, 0, shapeCanvas.width, shapeCanvas.height).data,
             dots = [],
@@ -1420,41 +1431,118 @@ book.addEventListener('contextmenu', (e) => {
 const musicControl = document.getElementById('musicControl');
 const birthdayAudio = document.getElementById('birthdayAudio');
 let isPlaying = false;
+let userManuallyPaused = false;
+let wasPlayingBeforeHidden = false;
 
-birthdayAudio.volume = 0.6;
+if (birthdayAudio) {
+    birthdayAudio.volume = 0.8;
+    birthdayAudio.loop = true;
+}
 
-function toggleMusic() {
-    if (isPlaying) {
-        birthdayAudio.pause();
-        musicControl.innerHTML = '▶';
-        musicControl.classList.remove('playing');
-        musicControl.title = 'Play Music';
-        isPlaying = false;
-    } else {
-        birthdayAudio.play().then(() => {
-            musicControl.innerHTML = '⏸';
+function updateMusicUI(playing) {
+    isPlaying = playing;
+    if (musicControl) {
+        musicControl.innerHTML = playing ? '⏸' : '▶';
+        if (playing) {
             musicControl.classList.add('playing');
             musicControl.title = 'Pause Music';
-            isPlaying = true;
-        }).catch(error => {
-        });
+        } else {
+            musicControl.classList.remove('playing');
+            musicControl.title = 'Play Music';
+        }
     }
 }
 
-musicControl.addEventListener('click', toggleMusic);
+function playAudio() {
+    if (!birthdayAudio) return Promise.reject(new Error('No audio element'));
+    birthdayAudio.volume = 0.8;
+    birthdayAudio.loop = true;
+    return birthdayAudio.play().then(() => {
+        updateMusicUI(true);
+        removeUnlockListeners();
+    });
+}
 
-birthdayAudio.addEventListener('ended', () => {
-});
+function pauseAudio() {
+    if (!birthdayAudio) return;
+    birthdayAudio.pause();
+    updateMusicUI(false);
+}
 
-birthdayAudio.addEventListener('error', (e) => {
-    musicControl.style.display = 'none';
-});
+function toggleMusic(e) {
+    if (e) e.stopPropagation();
+    if (isPlaying) {
+        userManuallyPaused = true;
+        pauseAudio();
+    } else {
+        userManuallyPaused = false;
+        playAudio().catch(error => console.log('Audio playback error:', error));
+    }
+}
+
+if (musicControl) {
+    musicControl.addEventListener('click', toggleMusic);
+}
+
+const unlockEvents = ['click', 'touchstart', 'touchend', 'mousedown', 'keydown', 'pointerdown'];
+function onUserGestureToPlay() {
+    if (!userManuallyPaused && !isPlaying) {
+        playAudio().catch(() => {});
+    }
+}
+
+function attachUnlockListeners() {
+    unlockEvents.forEach(evt => {
+        window.addEventListener(evt, onUserGestureToPlay, { capture: true, passive: true });
+        document.addEventListener(evt, onUserGestureToPlay, { capture: true, passive: true });
+    });
+}
+
+function removeUnlockListeners() {
+    unlockEvents.forEach(evt => {
+        window.removeEventListener(evt, onUserGestureToPlay, { capture: true });
+        document.removeEventListener(evt, onUserGestureToPlay, { capture: true });
+    });
+}
+
+function attemptAutoPlay() {
+    if (userManuallyPaused || isPlaying) return;
+    playAudio().catch(() => {
+        attachUnlockListeners();
+    });
+}
+
+if (birthdayAudio) {
+    birthdayAudio.addEventListener('ended', () => {
+        birthdayAudio.currentTime = 0;
+        playAudio().catch(() => {});
+    });
+
+    birthdayAudio.addEventListener('error', (e) => {
+        console.warn('Audio element error:', e);
+    });
+}
 
 document.addEventListener('visibilitychange', () => {
-    if (document.hidden && isPlaying) {
-        birthdayAudio.pause();
+    if (document.hidden) {
+        if (isPlaying) {
+            wasPlayingBeforeHidden = true;
+            birthdayAudio.pause();
+            updateMusicUI(false);
+        }
+    } else {
+        if (wasPlayingBeforeHidden && !userManuallyPaused) {
+            wasPlayingBeforeHidden = false;
+            playAudio().catch(() => {});
+        }
     }
 });
+
+// Trigger automatic sound as soon as possible
+attemptAutoPlay();
+document.addEventListener('DOMContentLoaded', attemptAutoPlay);
+window.addEventListener('load', attemptAutoPlay);
+
 
 let starsCreated = false;
 function createStars() {
@@ -1610,23 +1698,7 @@ window.debugBookImages = function() {
 };
 
 if (book) {
-    const forcePlayMusic = () => {
-        if (!isPlaying && birthdayAudio) {
-            birthdayAudio.play().then(() => {
-                const musicControl = document.getElementById('musicControl');
-                if(musicControl) {
-                    musicControl.innerHTML = '⏸';
-                    musicControl.classList.add('playing');
-                    musicControl.title = 'Pause Music';
-                }
-                isPlaying = true;
-            }).catch(error => {
-                console.log("Safari memblokir:", error);
-            });
-        }
-    };
-
-    book.addEventListener('touchstart', forcePlayMusic, { passive: true, once: true });
-    book.addEventListener('mousedown', forcePlayMusic, { once: true });
-    book.addEventListener('click', forcePlayMusic, { once: true });
+    book.addEventListener('touchstart', onUserGestureToPlay, { passive: true });
+    book.addEventListener('mousedown', onUserGestureToPlay);
+    book.addEventListener('click', onUserGestureToPlay);
 }
