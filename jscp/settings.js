@@ -261,21 +261,72 @@ function createPages() {
 }
 
 function updateFullscreenBtnVisibility() {
+    // Show the Big Screen button on ALL devices
     const btn = document.getElementById('fullscreenBtn');
     if (!btn) return;
-    btn.style.display = /Android/i.test(navigator.userAgent) ? 'block' : 'none';
+    btn.style.display = 'flex';
+}
+
+function _enterFullscreen() {
+    const el = document.documentElement;
+    if      (el.requestFullscreen)       el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else if (el.mozRequestFullScreen)    el.mozRequestFullScreen();
+    else if (el.msRequestFullscreen)     el.msRequestFullscreen();
+}
+
+function _exitFullscreen() {
+    if      (document.exitFullscreen)       document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    else if (document.mozCancelFullScreen)  document.mozCancelFullScreen();
+    else if (document.msExitFullscreen)     document.msExitFullscreen();
+}
+
+function _isFullscreen() {
+    return !!(document.fullscreenElement ||
+              document.webkitFullscreenElement ||
+              document.mozFullScreenElement ||
+              document.msFullscreenElement);
+}
+
+function _syncFullscreenBtn() {
+    const icon  = document.getElementById('fsIcon');
+    const label = document.getElementById('fsLabel');
+    if (_isFullscreen()) {
+        document.body.classList.add('is-fullscreen');
+        if (icon)  icon.textContent  = '⛶';
+        if (label) label.textContent = 'Exit Screen';
+        // Auto-hide hint toast after 3 s
+        clearTimeout(window._fsHintTimer);
+        window._fsHintTimer = setTimeout(() => {
+            document.body.classList.remove('is-fullscreen');
+            // re-add after timeout so button state stays green but toast hides
+            document.body.classList.add('is-fullscreen-quiet');
+        }, 3000);
+    } else {
+        document.body.classList.remove('is-fullscreen', 'is-fullscreen-quiet');
+        clearTimeout(window._fsHintTimer);
+        if (icon)  icon.textContent  = '⛶';
+        if (label) label.textContent = 'Big Screen';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
     const fsBtn = document.getElementById('fullscreenBtn');
     if (fsBtn) {
         fsBtn.addEventListener('click', function () {
-            const el = document.documentElement;
-            if (el.requestFullscreen) el.requestFullscreen();
-            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-            else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+            if (_isFullscreen()) {
+                _exitFullscreen();
+            } else {
+                _enterFullscreen();
+            }
         });
     }
+
+    // Keep button state in sync when user exits fullscreen via Esc / system
+    ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange']
+        .forEach(ev => document.addEventListener(ev, _syncFullscreenBtn));
+
     updateFullscreenBtnVisibility();
 
     initializeDefaultSettings();
