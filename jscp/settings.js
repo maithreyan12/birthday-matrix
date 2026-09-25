@@ -19,14 +19,6 @@ function initializeDefaultSettings() {
 
                 pages: [
             { image: 'assets/main.jpg' },
-            { image: 'assets/image2.jpg',
-              content: 'Happy Birthday! 🎂' },
-            { image: 'assets/image3.jpg' },
-            { image: 'assets/image4.jpg',
-              content: 'You make every day special ❤️' },
-            { image: 'assets/image5.jpg' },
-            { image: 'assets/image6.jpg',
-              content: 'Stay happy always, my love 💕' },
             { image: 'assets/image7.jpg',
               content: 'سکونِ قلب رب کے قریب ہے ✨' },
             { image: 'assets/image8.jpg',
