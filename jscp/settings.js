@@ -31,7 +31,7 @@ function initializeDefaultSettings() {
                 image: 'assets/image9.jpg',
                 content: 'میری ہر خوبصورت دعا کا جواب تم ہو 🌹'
             },
-            { image: 'assets/image10.pngin the' },
+            { image: 'assets/image10.png' },
             { image: 'assets/image11.png' }
         ],
     };
