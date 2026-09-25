@@ -125,7 +125,8 @@ function _applyPageFaceContent(face, pageData, logicalIndex, isFront) {
             <div class="book-backcover-face">
                 <div class="backcover-ornament">✦ ✧ ✦</div>
                 <div class="backcover-title">The End</div>
-                <div class="backcover-sub">With Infinite Love ❤️</div>
+                <div class="backcover-sub">With Infinite Love ∞</div>
+                <div class="backcover-name">Love You Afnaan ❤️</div>
             </div>
         `;
         return;

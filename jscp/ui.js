@@ -1171,9 +1171,13 @@ function checkBookFinished() {
     const totalPhysicalPages = Math.ceil(pages.length / 2);
     const lastPageIndex = totalPhysicalPages - 1;
     const lastPage = document.querySelector(`.page[data-page="${lastPageIndex}"]`);
-    if (currentPage === lastPageIndex && lastPage && lastPage.classList.contains('flipped')) {
+    if (currentPage >= totalPhysicalPages || (lastPage && lastPage.classList.contains('flipped'))) {
         if (!isBookFinished) {
             isBookFinished = true;
+            setTimeout(() => {
+                if (typeof showConfetti === 'function') showConfetti();
+                if (typeof showFloatingHearts === 'function') showFloatingHearts();
+            }, 300);
             const currentSettings = window.settings || settings;
             if (currentSettings.enableHeart) {
                 const contentDisplay = document.getElementById('contentDisplay');
